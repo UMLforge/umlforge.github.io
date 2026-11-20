@@ -1,0 +1,61 @@
+/* Monitoring dashboard (admin.html). Reuses the tokens from app.css. */
+body.adminPage { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 Inter, system-ui, sans-serif; }
+:root { --series: #6965db; --series-soft: rgba(105, 101, 219, 0.12); --text-2: #4a4438; }
+
+.loginWrap { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
+.loginCard { width: min(360px, 100%); padding: 22px; display: flex; flex-direction: column; gap: 12px; }
+.loginCard h1 { margin: 0 0 4px; font-size: 18px; }
+.loginCard .fld span { display: block; font-size: 12px; font-weight: 700; color: var(--mut); margin-bottom: 4px; }
+
+.dash { max-width: 1180px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.dashHead { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.dashHead h1 { font-size: 18px; margin: 0; }
+.dashActions { margin-left: auto; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.who { font-weight: 600; font-size: 13px; }
+.dash .card { margin: 0; }
+.dash h3 { margin: 0 0 10px; }
+
+/* service status: icon + word, never color alone */
+.statusRow { display: flex; gap: 8px; flex-wrap: wrap; }
+.pill { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--line); border-radius: 999px;
+  padding: 6px 12px 6px 8px; font-size: 13px; }
+.pill .ic { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 12px; }
+.pill.ok .ic { background: var(--good); } .pill.warn .ic { background: var(--warn); } .pill.bad .ic { background: var(--bad); }
+.pill b { font-weight: 700; }
+.pill .sub { color: var(--mut); }
+
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.tile { padding: 12px 14px; }
+.tLabel { font-size: 12px; font-weight: 700; color: var(--mut); }
+.tValue { font-size: 28px; font-weight: 800; letter-spacing: -.5px; margin-top: 2px; }
+.tSub { font-size: 12.5px; color: var(--text-2); margin-top: 4px; }
+.spark { position: relative; height: 46px; margin-top: 6px; }
+.spark svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.spark .empty { font-size: 12px; color: var(--mut); padding-top: 14px; }
+.sparkTip { position: absolute; top: -26px; transform: translateX(-50%); background: #1e1e1e; color: #fff; font-size: 11.5px; font-weight: 600;
+  padding: 3px 7px; border-radius: 6px; white-space: nowrap; pointer-events: none; }
+
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.row { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; border-bottom: 1px solid #f0ece3; font-size: 13px; }
+.row:last-child { border-bottom: none; }
+.row span:first-child { color: var(--mut); }
+.row span:last-child { font-weight: 600; text-align: right; }
+.meter { margin: 6px 0 10px; }
+.meterHead { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+.meterHead span:first-child { color: var(--mut); }
+.meterBar { height: 8px; background: #ece7da; border-radius: 99px; overflow: hidden; }
+.meterBar i { display: block; height: 100%; border-radius: 4px; background: var(--series); }
+.meterBar i.high { background: var(--warn); } .meterBar i.full { background: var(--bad); }
+.flag { font-size: 11px; font-weight: 700; margin-left: 6px; }
+.flag.high { color: var(--warn); } .flag.full { color: var(--bad); }
+
+.dtable { width: 100%; border-collapse: collapse; font-size: 13px; }
+.dtable th { text-align: left; font-size: 11.5px; color: var(--mut); font-weight: 700; padding: 4px 6px; border-bottom: 1px solid var(--line); }
+.dtable td { padding: 6px; border-bottom: 1px solid #f0ece3; vertical-align: top; }
+.dtable td.num, .dtable th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.errors td.details { font: 11.5px/1.4 ui-monospace, Consolas, monospace; color: var(--text-2); word-break: break-word; }
+.lvl { font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.lvl.error { color: var(--bad); } .lvl.warning { color: var(--warn); }
+
+@media (max-width: 900px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .grid2 { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .tiles { grid-template-columns: 1fr; } .errors td.details { display: none; } }

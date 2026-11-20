@@ -1,0 +1,82 @@
+/* Homepage and projects page. Builds on the tokens in app.css. */
+body.site { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 Inter, system-ui, sans-serif; }
+.site a { color: inherit; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+
+/* top navigation */
+.nav { display: flex; align-items: center; gap: 16px; padding: 14px 0; }
+.nav .brand { text-decoration: none; }
+.nav .links { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.nav .links a { text-decoration: none; font-weight: 600; font-size: 14px; padding: 8px 12px; border-radius: 9px; }
+.nav .links a:hover { background: #fff; }
+.nav .links a.cta { background: var(--ink); color: var(--paper); }
+.nav .links a[aria-current="page"] { background: #fff; border: 1px solid var(--line); }
+
+.btn { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 700; font-size: 15px; border-radius: 11px;
+  padding: 12px 18px; border: 1px solid var(--ink); cursor: pointer; font-family: inherit; }
+.btn.primary { background: var(--ink); color: var(--paper); }
+.btn.secondary { background: #fff; color: var(--ink); border-color: var(--line); }
+.btn.secondary:hover { border-color: var(--ink); }
+.btn.small { padding: 7px 12px; font-size: 13px; border-radius: 9px; }
+
+/* hero */
+.hero { display: grid; grid-template-columns: 1fr 1.1fr; gap: 40px; align-items: center; padding: 36px 0 28px; }
+.hero h1 { font-size: clamp(34px, 5vw, 52px); line-height: 1.05; letter-spacing: -1.5px; margin: 0 0 16px; }
+.hero h1 .hand { font-family: "Virgil", "Segoe Print", cursive; font-weight: 400; color: #6965db; letter-spacing: 0; }
+.hero p.lead { font-size: 18px; color: #4a4438; margin: 0 0 24px; max-width: 34ch; }
+.hero .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.heroArt { background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 18px 50px rgba(36, 33, 27, .12); overflow: hidden; }
+.heroArt canvas { display: block; width: 100%; height: 380px; }
+
+section.block { padding: 28px 0; }
+section.block h2 { font-size: 22px; margin: 0 0 14px; letter-spacing: -.3px; }
+.rowHead { display: flex; align-items: baseline; gap: 12px; }
+.rowHead a { margin-left: auto; font-size: 14px; font-weight: 600; }
+
+.features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.feature { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+.feature .ic { width: 34px; height: 34px; border-radius: 10px; background: #eeedfb; color: #4b47b8; display: grid; place-items: center; margin-bottom: 10px; }
+.feature .ic svg { width: 20px; height: 20px; }
+.feature h3 { margin: 0 0 4px; font-size: 15px; }
+.feature p { margin: 0; color: #5a5344; font-size: 14px; }
+
+/* project cards (homepage "recent" strip and projects page) */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.pcard { position: relative; background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
+.pcard:hover { border-color: #b9b4f0; box-shadow: 0 8px 24px rgba(36, 33, 27, .08); }
+.pcard .thumb { display: block; aspect-ratio: 16 / 10; background: #fbfaf7; border-bottom: 1px solid #f0ece3; }
+.pcard .thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.pcard .thumb .blank { width: 100%; height: 100%; display: grid; place-items: center; color: var(--mut); font-size: 13px; }
+.pcard .info { padding: 10px 12px 12px; }
+.pcard .title { font-weight: 700; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-decoration: none; display: block; }
+.pcard .meta { color: var(--mut); font-size: 12.5px; margin-top: 2px; }
+.pcard .tags { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.tagChip { font-size: 11px; font-weight: 600; border: 1px solid var(--line); border-radius: 99px; padding: 1px 8px; color: #4a4438; }
+.pcard .menu { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; opacity: 0; transition: opacity .15s; }
+.pcard:hover .menu, .pcard:focus-within .menu { opacity: 1; }
+.menu button { border: 1px solid var(--line); background: rgba(255, 255, 255, .95); border-radius: 8px; padding: 4px 8px; font-size: 12px;
+  font-weight: 600; cursor: pointer; font-family: inherit; }
+.menu button:hover { border-color: var(--ink); }
+.menu button.danger:hover { border-color: var(--bad); color: var(--bad); }
+.newCard { border: 2px dashed var(--line); background: transparent; display: grid; place-items: center; min-height: 200px; text-decoration: none;
+  font-weight: 700; color: #4a4438; border-radius: 14px; }
+.newCard:hover { border-color: #6965db; color: #4b47b8; }
+.newCard span { font-size: 30px; display: block; text-align: center; line-height: 1; }
+
+.toolbarRow { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 6px 0 16px; }
+.toolbarRow .search { flex: 1; min-width: 200px; max-width: 360px; }
+.note { color: var(--mut); font-size: 13px; }
+.empty { text-align: center; padding: 50px 0; color: var(--mut); }
+
+footer.foot { border-top: 1px solid var(--line); margin-top: 30px; padding: 18px 0 30px; color: var(--mut); font-size: 13px; display: flex; gap: 16px; flex-wrap: wrap; }
+
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; padding-top: 16px; }
+  .heroArt canvas { height: 280px; }
+  .features { grid-template-columns: 1fr 1fr; }
+  .pcard .menu { opacity: 1; }
+}
+@media (max-width: 560px) {
+  .features { grid-template-columns: 1fr; }
+  .nav .links a:not(.cta) { display: none; }
+}

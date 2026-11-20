@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Backend URL when hosted on its own (GitHub Pages). Empty = same origin. -->
+  <meta name="umlforge-api" content="">
+  <meta name="robots" content="noindex">
+  <title>UMLforge Monitoring</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="adminPage">
+  <!-- Sign in (accounts are created on the server: python -m app.admin create-user NAME) -->
+  <main id="loginView" class="loginWrap">
+    <form id="loginForm" class="card loginCard">
+      <h1>UMLforge monitoring</h1>
+      <label class="fld"><span>Username</span><input class="textInput" id="loginUser" autocomplete="username" required></label>
+      <label class="fld"><span>Password</span><input class="textInput" id="loginPass" type="password" autocomplete="current-password" required></label>
+      <button class="abtn primary" id="loginBtn" type="submit">Sign in</button>
+      <p class="muted">Admin accounts are created on the server with the admin command line. There is no sign-up.</p>
+    </form>
+  </main>
+
+  <main id="dashView" class="dash" hidden>
+    <header class="dashHead">
+      <h1>UMLforge monitoring</h1>
+      <span class="muted" id="updated"></span>
+      <div class="dashActions">
+        <label class="muted">Refresh
+          <select class="tsel" id="refreshSel"><option value="5">5 s</option><option value="15" selected>15 s</option><option value="60">1 min</option><option value="0">Off</option></select>
+        </label>
+        <span class="who" id="whoami"></span>
+        <button class="tbtn" id="logoutBtn">Sign out</button>
+      </div>
+    </header>
+
+    <section class="statusRow" id="statusRow" aria-label="Service status"></section>
+
+    <section class="tiles" aria-label="Key numbers">
+      <div class="card tile"><div class="tLabel">Requests / min</div><div class="tValue" id="tRpm">–</div><div class="spark" id="sRpm"></div></div>
+      <div class="card tile"><div class="tLabel">Response time (p95, 5 min)</div><div class="tValue" id="tP95">–</div><div class="spark" id="sP95"></div></div>
+      <div class="card tile"><div class="tLabel">CPU</div><div class="tValue" id="tCpu">–</div><div class="spark" id="sCpu"></div></div>
+      <div class="card tile"><div class="tLabel">Server errors (5 min)</div><div class="tValue" id="tErr">–</div><div class="tSub" id="tErrSub"></div></div>
+    </section>
+
+    <section class="grid2">
+      <div class="card">
+        <h3>System</h3>
+        <div id="systemBox"></div>
+      </div>
+      <div class="card">
+        <h3>Storage</h3>
+        <div id="storageBox"></div>
+      </div>
+    </section>
+
+    <section class="grid2">
+      <div class="card">
+        <h3>Traffic by area (last 5 min)</h3>
+        <table class="dtable" id="areaTable"></table>
+      </div>
+      <div class="card">
+        <h3>Limits</h3>
+        <div id="limitsBox"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>Recent errors and warnings <span class="muted" id="errCount"></span></h3>
+      <table class="dtable errors" id="errorTable"></table>
+    </section>
+  </main>
+
+  <script type="module" src="js/admin/admin.js"></script>
+</body>
+</html>

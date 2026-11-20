@@ -1,0 +1,48 @@
+# Publishes public/ to GitHub Pages (this repo = the frontend folder on its own).
+# Setup: Settings → Pages → Source = "GitHub Actions".
+# Backend (optional): Settings → Secrets and variables → Actions → Variables → UMLFORGE_API_URL,
+# e.g. https://yourname.pythonanywhere.com. Leave it unset to deploy the frontend alone.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Point the UI at the backend (if configured)
+        env:
+          API_URL: ${{ vars.UMLFORGE_API_URL }}
+        run: |
+          if [ -z "$API_URL" ]; then
+            echo "::notice::UMLFORGE_API_URL not set: deploying without a backend (drawing and projects work; analysis, samples, AI and publishing don't)."
+            exit 0
+          fi
+          for page in public/editor.html public/admin.html; do
+            sed -i "s#<meta name=\"umlforge-api\" content=\"\">#<meta name=\"umlforge-api\" content=\"${API_URL%/}\">#" "$page"
+            grep -q "content=\"${API_URL%/}\"" "$page" || { echo "::error::API URL not written into $page"; exit 1; }
+          done
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+      - id: deployment
+        uses: actions/deploy-pages@v4

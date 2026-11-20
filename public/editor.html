@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Backend URL when the UI is hosted on its own (GitHub Pages). Empty = same origin. -->
+  <meta name="umlforge-api" content="">
+  <title>UMLforge Editor</title>
+  <meta name="description" content="Sketch UML class and use-case diagrams and get a flaw score, concrete fixes and an optional AI design review.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect width='20' height='20' rx='4' fill='%2324211b'/%3E%3Cg fill='none' stroke='%23fbf8f0' stroke-width='1.7'%3E%3Crect x='3.5' y='3.5' width='5' height='5'/%3E%3Crect x='11.5' y='11.5' width='5' height='5'/%3E%3Cpath d='M8.5 8.5l3 3'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Inter:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <a class="brand" href="./" title="Home">
+      <div class="brandMark"><svg viewBox="0 0 20 20" fill="none" stroke="#fbf8f0" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="2.5" y="2.5" width="6" height="6" rx="1"/><rect x="11.5" y="11.5" width="6" height="6" rx="1"/><path d="M8.5 8.5l3 3"/></svg></div>
+      <div>UMLforge<small>sketch UML · flaw score · fixes</small></div>
+    </a>
+    <input id="titleInput" class="titleInput" value="Untitled" aria-label="Diagram title" maxlength="120">
+    <div class="topActions">
+      <button class="tbtn" id="sideToggleBtn" title="Toggle side panel">Panel</button>
+      <span class="tsep"></span>
+      <button class="tbtn editOnly" id="newBtn" title="Start a new project">New</button>
+      <button class="tbtn editOnly" id="openBtn" title="All your projects">Projects</button>
+      <button class="tbtn primary editOnly" id="saveBtn" title="Your work autosaves in this browser. Save also keeps a copy on the server (Ctrl+S).">Save</button>
+      <button class="tbtn editOnly" id="publishBtn" title="Publish a read-only link that expires">Publish</button>
+      <span class="tsep"></span>
+      <button class="tbtn editOnly" id="undoBtn" title="Undo (Ctrl+Z)">↩ Undo</button>
+      <button class="tbtn editOnly" id="redoBtn" title="Redo (Ctrl+Shift+Z)">↪ Redo</button>
+      <button class="tbtn toggle on" id="gridBtn" title="Toggle grid">Grid</button>
+      <button class="tbtn toggle on" id="liveCheckBtn" title="Live OOP and UML checks: badges, hover tooltips and callouts on the canvas">Live checks</button>
+      <select class="tsel" id="sloppinessSelect" title="Sloppiness: how hand-drawn shapes look (Excalidraw styles)">
+        <option value="0">Architect</option>
+        <option value="1" selected>Artist</option>
+        <option value="2">Cartoonist</option>
+      </select>
+      <span class="tsep"></span>
+      <button class="tbtn editOnly" id="importBtn" title="Import a diagram JSON file">Import</button>
+      <button class="tbtn" id="exportBtn" title="Download the diagram as JSON">JSON</button>
+      <button class="tbtn" id="pngBtn" title="Export a PNG image">PNG</button>
+      <button class="tbtn editOnly" id="clearBtn" title="Clear the canvas">Clear</button>
+      <button class="tbtn" id="helpBtn" title="Help and shortcuts">Help</button>
+    </div>
+  </header>
+
+  <!-- Tool buttons are generated from the shape and link registries (ui/toolbar.js). -->
+  <div id="toolstrip" role="toolbar" aria-label="Diagram tools"></div>
+
+  <div id="workspace">
+    <div id="canvasWrap">
+      <canvas id="board"></canvas>
+      <div id="zoomCtl">
+        <button id="zoomOutBtn" title="Zoom out">−</button>
+        <span id="zoomLabel">100%</span>
+        <button id="zoomInBtn" title="Zoom in">+</button>
+        <button id="fitBtn" title="Fit diagram to screen">Fit</button>
+        <button id="zoomOverviewBtn" title="Overview: collapse all containers" hidden>Overview</button>
+        <button id="zoomExpandBtn" title="Detail: expand all containers" hidden>Expand</button>
+      </div>
+      <div id="hintBar"></div>
+      <div id="viewBanner" hidden>Shared diagram · read-only · <span id="viewExpiry"></span>
+        <button class="abtn small primary" id="editCopyBtn">Edit a copy</button></div>
+    </div>
+
+    <aside id="side">
+      <nav id="tabRow">
+        <button class="tabBtn active" data-pane="problemPane">Problem</button>
+        <button class="tabBtn" data-pane="inspectorPane">Inspector</button>
+        <button class="tabBtn" data-pane="outlinePane">Outline</button>
+        <button class="tabBtn" data-pane="analyzePane">Analyze</button>
+      </nav>
+      <div id="sideBody">
+        <section class="pane active" id="problemPane">
+          <div class="card">
+            <h3>Software problem</h3>
+            <textarea class="textInput" id="problemInput" rows="7" placeholder="Describe the software to model. Example: A library where members borrow books..."></textarea>
+            <div class="btnRow">
+              <button class="abtn primary" id="starterBtn">Generate starter diagram</button>
+            </div>
+            <div class="muted" id="starterNote">Drafts classes from your text.</div>
+            <h4>Samples</h4>
+            <div class="chipRow" id="sampleRow"><span class="muted">Loading…</span></div>
+          </div>
+          <div class="card">
+            <h3>Diagram stats</h3>
+            <div class="kv"><span>Classes and interfaces</span><b id="statClass">0</b></div>
+            <div class="kv"><span>Actors and use cases</span><b id="statActor">0</b></div>
+            <div class="kv"><span>Relationships</span><b id="statEdge">0</b></div>
+            <div class="kv"><span>Notes</span><b id="statNote">0</b></div>
+            <div class="kv"><span>Problem keywords covered</span><b id="statCover">—</b></div>
+          </div>
+        </section>
+
+        <section class="pane" id="inspectorPane">
+          <div class="card">
+            <h3>Inspector</h3>
+            <div class="muted" id="inspEmpty">Nothing selected. Click a shape on the canvas, or draw one with a tool from the top strip.</div>
+            <div id="inspForm"></div>
+          </div>
+          <div class="card">
+            <h3>Tips</h3>
+            <div class="muted">Double-click a shape on the canvas to edit it in place.</div>
+          </div>
+        </section>
+
+        <section class="pane" id="outlinePane">
+          <div class="card">
+            <h3>Outline</h3>
+            <div class="btnRow" id="overviewBtns">
+              <button class="abtn small" id="overviewBtn" title="Collapse every container">Overview</button>
+              <button class="abtn small" id="expandAllBtn" title="Expand every container">Expand all</button>
+            </div>
+            <div class="muted" id="outlineHelp">Select shapes and use <b>Group into</b> (or Ctrl+G) to organize them into packages, modules, components, containers or plugins.</div>
+            <div id="outlineTree" class="outline"></div>
+          </div>
+        </section>
+
+        <section class="pane" id="analyzePane">
+          <div class="card">
+            <h3>Diagram analysis</h3>
+            <div class="btnRow">
+              <button class="abtn primary" id="runLocalBtn">Run analysis</button>
+              <button class="abtn" id="runAiBtn">AI design review</button>
+            </div>
+            <div class="muted" id="aiStatus"></div>
+          </div>
+          <!-- AI review sits right under the buttons, so its result (or error) is visible without scrolling. -->
+          <div class="card" id="aiCard">
+            <h3>AI design review</h3>
+            <div id="aiOut" class="aiOut empty">No review yet.</div>
+          </div>
+          <div class="card" id="localCard" hidden>
+            <h3>Quality and flaw score</h3>
+            <div class="scoreTop">
+              <svg class="donut" viewBox="0 0 100 100" aria-hidden="true">
+                <circle cx="50" cy="50" r="42" fill="none" stroke="#e7dfc9" stroke-width="12"/>
+                <circle id="donutArc" cx="50" cy="50" r="42" fill="none" stroke="#bf4d22" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 264" transform="rotate(-90 50 50)"/>
+                <text id="donutText" x="50" y="57" text-anchor="middle" font-size="21" font-weight="800" fill="#24211b">–</text>
+              </svg>
+              <div class="grow">
+                <div class="kv"><span>Quality</span><b id="qualityNum">–</b></div>
+                <div class="kv"><span>Flaw score</span><b id="flawNum">–</b></div>
+                <span class="gradeBadge" id="gradeBadge">–</span>
+              </div>
+            </div>
+            <details class="dims"><summary>Dimensions</summary><div id="dimList"></div></details>
+          </div>
+          <div class="card" id="issueCard" hidden>
+            <h3>Issues <span id="issueCount" class="count"></span></h3>
+            <div class="chipRow" id="issueFilter"></div>
+            <div id="issueList"></div>
+          </div>
+        </section>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="modal" id="helpModal" hidden>
+  <div class="modalCard">
+    <h2>UMLforge help</h2>
+    <p class="muted">A whiteboard tuned for UML. Sketch classes, connect them, describe the problem, then Analyze for a flaw score with concrete fixes.</p>
+    <h4>Tools</h4>
+    <table>
+      <tr><td><b>Select (V)</b></td><td>Drag a shape to move it. Shift-click to multi-select, drag empty ground to box-select, corner handles resize.</td></tr>
+      <tr><td><b>Hand (H)</b></td><td>Drag to pan. Pressing a shape switches to Select. Space+drag or middle-drag pans from any tool; the wheel zooms.</td></tr>
+      <tr><td><b>UML shapes</b></td><td>Click the canvas to drop one, then edit its name and members in the Inspector.</td></tr>
+      <tr><td><b>Links</b></td><td>Press on a source shape and release on a target shape. Select returns after each link.</td></tr>
+    </table>
+    <h4>Shortcuts</h4>
+    <table id="shortcutTable"></table>
+    <div class="btnRow"><button class="abtn primary" data-close>Close</button></div>
+  </div>
+</div>
+
+<div class="modal" id="publishModal" hidden>
+  <div class="modalCard">
+    <h2>Publish a link</h2>
+    <p class="muted">Anyone with the link can view this diagram, read-only, until it expires. No account needed.</p>
+    <div class="btnRow">
+      <select class="textInput" id="publishTtl" style="width:auto">
+        <option value="1">Expires in 1 hour</option>
+        <option value="24" selected>Expires in 1 day</option>
+        <option value="168">Expires in 7 days</option>
+      </select>
+      <button class="abtn primary" id="publishGo">Publish</button>
+    </div>
+    <div id="publishResult" hidden>
+      <div class="btnRow"><input class="textInput" id="publishLink" readonly style="flex:1"><button class="abtn" id="publishCopy">Copy</button></div>
+      <div class="muted" id="publishExpiry"></div>
+    </div>
+    <div class="btnRow"><button class="abtn" data-close>Close</button></div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept="application/json,.json" hidden>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
